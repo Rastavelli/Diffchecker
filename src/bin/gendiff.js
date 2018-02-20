@@ -1,3 +1,4 @@
 #!/usr/bin/env node
+import program from '..';
 
-console.log('Gendiff CLI bin');
+program();
