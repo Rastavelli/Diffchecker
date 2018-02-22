@@ -4,7 +4,7 @@
   "description": "cli for finding differences between config files",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch",
     "babel-node": "babel-node",
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build",
@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/Rastavelli/project-lvl2-s193#readme",
   "dependencies": {
-    "commander": "*"
+    "commander": "*",
+    "lodash": "*"
   },
   "devDependencies": {
     "babel-cli": "*",
@@ -35,9 +36,11 @@
     "eslint": "*",
     "eslint-config-airbnb-base": "*",
     "eslint-plugin-import": "*",
+    "eslint-plugin-jest": "^21.12.1",
+    "babel-jest": "^22.2.2",
     "babel-eslint": "*",
-    "jest": "^21",
-    "jest-cli": "^22.3.0"
+    "jest": "*",
+    "jest-cli": "*"
   },
   "bin": {
     "gendiff": "dist/bin/gendiff.js"
