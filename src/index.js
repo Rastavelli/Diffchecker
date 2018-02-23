@@ -1,6 +1,7 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
+import ini from 'ini';
 
 import { keys, has, union, join } from 'lodash';
 
@@ -17,11 +18,12 @@ const fileExtensionMapping =
   {
     '.json': JSON.parse,
     '.yaml': yaml.safeLoad,
+    '.ini': ini.parse,
   };
 
 const fileDataToObj = (pathToFile) => {
   const extension = path.extname(pathToFile);
-  const content = fs.readFileSync(pathToFile);
+  const content = fs.readFileSync(pathToFile, 'utf-8');
   return fileExtensionMapping[extension](content);
 };
 
