@@ -1,25 +1,33 @@
 import fs from 'fs';
 import { keys, intersection, isEqual, has, difference, concat, join } from 'lodash';
 
+const showNotChanged = (before, after) =>
+  intersection(keys(before), keys(after))
+    .filter(key => isEqual(before[key], after[key]))
+    .map(key => `  ${key}: ${after[key]}`);
+
+const showChanged = (before, after) =>
+  intersection(keys(before), keys(after))
+    .filter(key => has(before, key) && has(after, key))
+    .filter(key => !isEqual(before[key], after[key]))
+    .map(key => `+ ${key}: ${after[key]}
+    - ${key}: ${before[key]}`);
+
+const showDiff = (before, after, sign) =>
+  difference(keys(before), keys(after))
+    .map(key => `${sign} ${key}: ${before[key]}`);
+
 const genDiff = (pathToFile1, pathToFile2) => {
   const beforeData = JSON.parse(fs.readFileSync(pathToFile1));
   const afterData = JSON.parse(fs.readFileSync(pathToFile2));
 
-  const notChanged = intersection(keys(beforeData), keys(afterData))
-    .filter(key => isEqual(beforeData[key], afterData[key]))
-    .map(key => `  ${key}: ${afterData[key]}`);
+  const notChanged = showNotChanged(beforeData, afterData);
 
-  const changed = intersection(keys(beforeData), keys(afterData))
-    .filter(key => has(beforeData, key) && has(afterData, key))
-    .filter(key => !isEqual(beforeData[key], afterData[key]))
-    .map(key => `+ ${key}: ${afterData[key]}
-    - ${key}: ${beforeData[key]}`);
+  const changed = showChanged(beforeData, afterData);
 
-  const deleted = difference(keys(beforeData), keys(afterData))
-    .map(key => `- ${key}: ${beforeData[key]}`);
+  const deleted = showDiff(beforeData, afterData, '-');
 
-  const added = difference(keys(afterData), keys(beforeData))
-    .map(key => `+ ${key}: ${afterData[key]}`);
+  const added = showDiff(afterData, beforeData, '+');
 
   const all = concat(notChanged, changed, deleted, added);
 
