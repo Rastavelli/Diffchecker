@@ -1,6 +1,6 @@
 {
   "name": "gendiff-2018",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "cli for finding differences between config files",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,8 @@
   "homepage": "https://github.com/Rastavelli/project-lvl2-s193#readme",
   "dependencies": {
     "commander": "*",
-    "lodash": "*"
+    "lodash": "*",
+    "js-yaml": "*"
   },
   "devDependencies": {
     "babel-cli": "*",
