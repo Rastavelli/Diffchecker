@@ -36,8 +36,8 @@
     "eslint": "*",
     "eslint-config-airbnb-base": "*",
     "eslint-plugin-import": "*",
-    "eslint-plugin-jest": "^21.12.1",
-    "babel-jest": "^22.2.2",
+    "eslint-plugin-jest": "*",
+    "babel-jest": "*",
     "babel-eslint": "*",
     "jest": "*",
     "jest-cli": "*"
