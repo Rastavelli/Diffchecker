@@ -1,39 +1,43 @@
 import fs from 'fs';
-import { keys, intersection, isEqual, has, difference, concat, join } from 'lodash';
+import { keys, has, union, join } from 'lodash';
 
-const showNotChanged = (before, after) =>
-  intersection(keys(before), keys(after))
-    .filter(key => isEqual(before[key], after[key]))
-    .map(key => `  ${key}: ${after[key]}`);
-
-const showChanged = (before, after) =>
-  intersection(keys(before), keys(after))
-    .filter(key => has(before, key) && has(after, key))
-    .filter(key => !isEqual(before[key], after[key]))
-    .map(key => `+ ${key}: ${after[key]}
-    - ${key}: ${before[key]}`);
-
-const showDiff = (before, after, sign) =>
-  difference(keys(before), keys(after))
-    .map(key => `${sign} ${key}: ${before[key]}`);
+const lineTypes =
+  {
+    notChanged: ({ name, after }) => `  ${name}: ${after}`,
+    changed: ({ name, after, before }) => `+ ${name}: ${after}
+    - ${name}: ${before}`,
+    deleted: ({ name, before }) => `- ${name}: ${before}`,
+    added: ({ name, after }) => `+ ${name}: ${after}`,
+  };
 
 const genDiff = (pathToFile1, pathToFile2) => {
   const beforeData = JSON.parse(fs.readFileSync(pathToFile1));
   const afterData = JSON.parse(fs.readFileSync(pathToFile2));
 
-  const notChanged = showNotChanged(beforeData, afterData);
+  const ast = union(keys(beforeData), keys(afterData))
+    .map((key) => {
+      const node = {
+        name: [key],
+        type: '',
+        before: beforeData[key],
+        after: afterData[key],
+      };
 
-  const changed = showChanged(beforeData, afterData);
+      if (has(beforeData, node.name) && has(afterData, node.name)) {
+        node.type = (node.after === node.before) ? 'notChanged' : 'changed';
+      } else if (has(beforeData, node.name)) {
+        node.type = 'deleted';
+      } else {
+        node.type = 'added';
+      }
+      return node;
+    });
 
-  const deleted = showDiff(beforeData, afterData, '-');
-
-  const added = showDiff(afterData, beforeData, '+');
-
-  const all = concat(notChanged, changed, deleted, added);
+  const diffLines = astToRender => astToRender.map(node => lineTypes[node.type](node));
 
   const result = `
   {
-    ${join(all, '\n    ')}
+    ${join(diffLines(ast), '\n    ')}
   }`;
   return result;
 };
