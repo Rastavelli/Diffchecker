@@ -3,13 +3,12 @@ import yaml from 'js-yaml';
 import path from 'path';
 import ini from 'ini';
 
-import { keys, has, union, join } from 'lodash';
+import { keys, has, union, join, flatten } from 'lodash';
 
 const lineTypes =
   {
     notChanged: ({ name, after }) => `  ${name}: ${after}`,
-    changed: ({ name, after, before }) => `+ ${name}: ${after}
-    - ${name}: ${before}`,
+    changed: ({ name, after, before }) => [`+ ${name}: ${after}`, `- ${name}: ${before}`],
     deleted: ({ name, before }) => `- ${name}: ${before}`,
     added: ({ name, after }) => `+ ${name}: ${after}`,
   };
@@ -34,22 +33,23 @@ const genDiff = (pathToFile1, pathToFile2) => {
   const ast = union(keys(beforeObj), keys(afterObj))
     .map((key) => {
       const node = {
-        name: [key],
-        type: '',
+        name: key,
         before: beforeObj[key],
         after: afterObj[key],
       };
 
-      if (has(beforeObj, node.name) && has(afterObj, node.name)) {
-        return { ...node, type: (node.after === node.before) ? 'notChanged' : 'changed' };
-      } else if (has(beforeObj, node.name)) {
+      if (has(beforeObj, key) && has(afterObj, key)) {
+        return { ...node, type: (beforeObj[key] === afterObj[key]) ? 'notChanged' : 'changed' };
+      } else if (has(beforeObj, key)) {
         return { ...node, type: 'deleted' };
       }
       return { ...node, type: 'added' };
     });
 
-  const diffLines = astToRender => astToRender.map(node => lineTypes[node.type](node));
-
+  const diffLines = (astToRender) => {
+    const renderedAst = flatten(astToRender.map(node => lineTypes[node.type](node)));
+    return renderedAst;
+  };
   const result = `
   {
     ${join(diffLines(ast), '\n    ')}
