@@ -2,59 +2,28 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import path from 'path';
 import ini from 'ini';
+import render from './render';
+import buildAst from './buildAst';
 
-import { keys, has, union, join, flatten } from 'lodash';
-
-const lineTypes =
-  {
-    notChanged: ({ name, after }) => `  ${name}: ${after}`,
-    changed: ({ name, after, before }) => [`+ ${name}: ${after}`, `- ${name}: ${before}`],
-    deleted: ({ name, before }) => `- ${name}: ${before}`,
-    added: ({ name, after }) => `+ ${name}: ${after}`,
-  };
-
-const fileExtensionMapping =
+const parsers =
   {
     '.json': JSON.parse,
     '.yaml': yaml.safeLoad,
     '.ini': ini.parse,
   };
 
-const fileDataToObj = (pathToFile) => {
-  const extension = path.extname(pathToFile);
-  const content = fs.readFileSync(pathToFile, 'utf-8');
-  return fileExtensionMapping[extension](content);
+const parse = (pathToFile) => {
+  const fileExtension = path.extname(pathToFile);
+  const fileContent = fs.readFileSync(pathToFile, 'utf-8');
+  return parsers[fileExtension](fileContent);
 };
 
 const genDiff = (pathToFile1, pathToFile2) => {
-  const beforeObj = fileDataToObj(pathToFile1);
-  const afterObj = fileDataToObj(pathToFile2);
+  const beforeObj = parse(pathToFile1);
+  const afterObj = parse(pathToFile2);
+  const ast = buildAst(beforeObj, afterObj);
 
-  const ast = union(keys(beforeObj), keys(afterObj))
-    .map((key) => {
-      const node = {
-        name: key,
-        before: beforeObj[key],
-        after: afterObj[key],
-      };
-
-      if (has(beforeObj, key) && has(afterObj, key)) {
-        return { ...node, type: (beforeObj[key] === afterObj[key]) ? 'notChanged' : 'changed' };
-      } else if (has(beforeObj, key)) {
-        return { ...node, type: 'deleted' };
-      }
-      return { ...node, type: 'added' };
-    });
-
-  const diffLines = (astToRender) => {
-    const renderedAst = flatten(astToRender.map(node => lineTypes[node.type](node)));
-    return renderedAst;
-  };
-  const result = `
-  {
-    ${join(diffLines(ast), '\n    ')}
-  }`;
-  return result;
+  return render(ast);
 };
 
 export default genDiff;

@@ -1,43 +1,45 @@
+import fs from 'fs';
 import genDiff from '../src';
 
-test('json difference', () => {
-  const filePath1 = '__tests__/__fixtures__/before.json';
-  const filePath2 = '__tests__/__fixtures__/after.json';
-  const diffResult = `
-  {
-      host: hexlet.io
-    + timeout: 20
-    - timeout: 50
-    - proxy: 123.234.53.22
-    + verbose: true
-  }`;
-  expect(genDiff(filePath1, filePath2)).toBe(diffResult);
+describe('Flat difference', () => {
+  const expectedFlatDiff = fs.readFileSync('__tests__/__fixtures__/flat/result', 'utf-8');
+
+  it('json flat difference', () => {
+    const jsonFilePath1 = '__tests__/__fixtures__/flat/before.json';
+    const jsonFilePath2 = '__tests__/__fixtures__/flat/after.json';
+    expect(genDiff(jsonFilePath1, jsonFilePath2)).toBe(expectedFlatDiff);
+  });
+
+  it('yaml flat difference', () => {
+    const yamlFilePath1 = '__tests__/__fixtures__/flat/before.yaml';
+    const yamlFilePath2 = '__tests__/__fixtures__/flat/after.yaml';
+    expect(genDiff(yamlFilePath1, yamlFilePath2)).toBe(expectedFlatDiff);
+  });
+
+  it('ini flat difference', () => {
+    const flatIniFilePath1 = '__tests__/__fixtures__/flat/before.ini';
+    const flatIniFilePath2 = '__tests__/__fixtures__/flat/after.ini';
+    expect(genDiff(flatIniFilePath1, flatIniFilePath2)).toBe(expectedFlatDiff);
+  });
 });
 
-test('yaml difference', () => {
-  const filePath1 = '__tests__/__fixtures__/before.yaml';
-  const filePath2 = '__tests__/__fixtures__/after.yaml';
-  const diffResult = `
-  {
-      host: hexlet.io
-    + timeout: 20
-    - timeout: 50
-    - proxy: 123.234.53.22
-    + verbose: true
-  }`;
-  expect(genDiff(filePath1, filePath2)).toBe(diffResult);
-});
+describe('nested diff', () => {
+  const expectedNestedDiff = fs.readFileSync('__tests__/__fixtures__/nested/result', 'utf-8');
+  it('json nested difference', () => {
+    const nestedJsonFilePath1 = '__tests__/__fixtures__/nested/before.json';
+    const nestedJsonFilePath2 = '__tests__/__fixtures__/nested/after.json';
+    expect(genDiff(nestedJsonFilePath1, nestedJsonFilePath2)).toBe(expectedNestedDiff);
+  });
 
-test('ini difference', () => {
-  const filePath1 = '__tests__/__fixtures__/before.ini';
-  const filePath2 = '__tests__/__fixtures__/after.ini';
-  const diffResult = `
-  {
-      host: hexlet.io
-    + timeout: 20
-    - timeout: 50
-    - proxy: 123.234.53.22
-    + verbose: true
-  }`;
-  expect(genDiff(filePath1, filePath2)).toBe(diffResult);
+  it('yaml flat difference', () => {
+    const yamlFilePath1 = '__tests__/__fixtures__/nested/before.yaml';
+    const yamlFilePath2 = '__tests__/__fixtures__/nested/after.yaml';
+    expect(genDiff(yamlFilePath1, yamlFilePath2)).toBe(expectedNestedDiff);
+  });
+
+  it('ini flat difference', () => {
+    const flatIniFilePath1 = '__tests__/__fixtures__/nested/before.ini';
+    const flatIniFilePath2 = '__tests__/__fixtures__/nested/after.ini';
+    expect(genDiff(flatIniFilePath1, flatIniFilePath2)).toBe(expectedNestedDiff);
+  });
 });
