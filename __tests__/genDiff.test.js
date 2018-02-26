@@ -21,27 +21,27 @@ describe('Flat diff', () => {
   const expectedPlainDiff = fs.readFileSync('__tests__/__fixtures__/plain/result', 'utf-8');
 
   it('json flat diff', () => {
-    expect(genDiff(flatJsonFilePath1, flatJsonFilePath2, 'json')).toBe(expectedFlatDiff);
+    expect(genDiff(flatJsonFilePath1, flatJsonFilePath2, 'tree')).toBe(expectedFlatDiff);
   });
 
   it('yaml flat diff', () => {
-    expect(genDiff(flatYamlFilePath1, flatYamlFilePath2, 'json')).toBe(expectedFlatDiff);
+    expect(genDiff(flatYamlFilePath1, flatYamlFilePath2, 'tree')).toBe(expectedFlatDiff);
   });
 
   it('ini flat diff', () => {
-    expect(genDiff(flatIniFilePath1, flatIniFilePath2, 'json')).toBe(expectedFlatDiff);
+    expect(genDiff(flatIniFilePath1, flatIniFilePath2, 'tree')).toBe(expectedFlatDiff);
   });
 
   it('json nested diff', () => {
-    expect(genDiff(nestedJsonFilePath1, nestedJsonFilePath2, 'json')).toBe(expectedNestedDiff);
+    expect(genDiff(nestedJsonFilePath1, nestedJsonFilePath2, 'tree')).toBe(expectedNestedDiff);
   });
 
   it('yaml nested diff', () => {
-    expect(genDiff(nestedYamlFilePath1, nestedYamlFilePath2, 'json')).toBe(expectedNestedDiff);
+    expect(genDiff(nestedYamlFilePath1, nestedYamlFilePath2, 'tree')).toBe(expectedNestedDiff);
   });
 
   it('ini nested diff', () => {
-    expect(genDiff(nestedIniFilePath1, nestedIniFilePath2, 'json')).toBe(expectedNestedDiff);
+    expect(genDiff(nestedIniFilePath1, nestedIniFilePath2, 'tree')).toBe(expectedNestedDiff);
   });
 
   it('json plain diff', () => {
