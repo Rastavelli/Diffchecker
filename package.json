@@ -1,6 +1,6 @@
 {
   "name": "gendiff-2018",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "cli for finding differences between config files",
   "main": "index.js",
   "scripts": {
